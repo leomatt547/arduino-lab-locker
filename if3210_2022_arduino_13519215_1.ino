@@ -1,7 +1,7 @@
 #include <LiquidCrystal.h>
 #include <Keypad.h>
 #include <Servo.h>
-#include <Wire.h>    
+#include <Wire.h>
 
 unsigned long myTime;
 Servo s;
@@ -15,7 +15,7 @@ int i = 0;
 int j = 0;
 int a = 0, b = 0, c = 0, d = 0;
 int var = 0;
-//int C1 = 1, C2 = 2, C3 = 3, C4 = 4;
+// int C1 = 1, C2 = 2, C3 = 3, C4 = 4;
 int password[] = {1, 2, 3, 4};
 char f = '*';
 
@@ -49,10 +49,25 @@ void setup()
   Serial.begin(9600);
 }
 
-void receiveEvent( int howMany )
+void receiveEvent(int howMany)
 {
-   x = Wire.read(); // read one character from the I2C
-   // Cek apakah tombol dari dalam ditekan atau tidak
+  if (howMany == 1)
+  {
+    x = Wire.read(); // read one character from the I2C
+                     // Cek apakah tombol dari dalam ditekan atau tidak
+  }
+  else
+  {
+    for (int i = 0; i < howMany; i++)
+    {
+      password[i] = Wire.read();
+    }
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Sandi Berubah!");
+    delay(1000);
+    lcd.clear();
+  }
 }
 
 void loop()
@@ -104,7 +119,7 @@ void loop()
               x = 1;
               Wire.beginTransmission(13);
               Wire.write(x); // sends x
-              //Serial.println(x);
+              // Serial.println(x);
               Wire.endTransmission(); // stop transmitting
               myTime = millis();
             }
@@ -155,22 +170,24 @@ void loop()
   }
   if (!prompt)
   {
-     if (x == 1) {
-       lcd.clear();
-       lcd.setCursor(0, 0), lcd.print("Pintu Terbuka");
-       lcd.setCursor(0, 1), lcd.print("             ");
-       s.write(position_open);
-       servo_state = 1;
-       delay(1000);
-     }
-     else{
-       s.write(position_close);
-       servo_state = 0;
-       delay(1000);
-       lcd.clear();
-       lcd.setCursor(0, 0), lcd.print("Welcome to Lab");
+    if (x == 1)
+    {
+      lcd.clear();
+      lcd.setCursor(0, 0), lcd.print("Pintu Terbuka");
+      lcd.setCursor(0, 1), lcd.print("             ");
+      s.write(position_open);
+      servo_state = 1;
+      delay(1000);
     }
-    //lcd.setCursor(0, 0), lcd.print("Welcome to Lab");
+    else
+    {
+      s.write(position_close);
+      servo_state = 0;
+      delay(1000);
+      lcd.clear();
+      lcd.setCursor(0, 0), lcd.print("Welcome to Lab");
+    }
+    // lcd.setCursor(0, 0), lcd.print("Welcome to Lab");
   }
   delay(200);
   // servo
